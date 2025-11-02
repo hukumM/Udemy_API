@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id "org.openapi.generator" version "7.3.0" // 最新安定版
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    compileOnly 'io.swagger.core.v3:swagger-annotations:2.2.21'
+}
+
+
+openApiGenerate {
+    // 出力形式
+    generatorName = 'spring'
+
+    // OpenAPI仕様ファイル（yaml）のパス
+    inputSpec = "$rootDir/openapi/shukanTalentJohoBFF.yaml"
+
+    // 生成コードの出力先
+    outputDir = "$buildDir/generated"
+
+    // パッケージ構成
+    apiPackage = 'com.example.api'
+    modelPackage = 'com.example.model'
+    invokerPackage = 'com.example.invoker'
+
+    // 追加オプション
+    configOptions = [
+        dateLibrary: 'java8',
+        interfaceOnly: 'true',
+        skipDefaultInterface: 'true'
+    ]
+}
+
+// 生成したコードをビルド対象に追加
+sourceSets {
+    main {
+        java {
+            srcDir("$buildDir/generated/src/main/java")
+        }
+    }
+}
+
+task buildApiDoc(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName.set("html2")
+    inputSpec.set("$rootDir/src/main/resources/api-schema.yaml")
+    outputDir.set("$buildDir/apidoc")
+}
+
+task buildSpringServer(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/src/main/resources/api-schema.yaml")
+    outputDir.set("$buildDir/spring")
+    apiPackage.set("com.example.api.controller")
+    modelPackage.set("com.example.api.model")
+    configOptions.set([
+		interfaceOnly: "true"
+    ])
+}
+
+compileJava.dependsOn tasks.buildSpringServer
