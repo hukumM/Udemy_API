@@ -1,5 +1,7 @@
-//package com.example.todo_api;
-//
-//public class HealthController implements HealthApi{
-//
-//}
+package com.example.todo_api;
+
+import com.example.todo_api.controller.HealthApi;
+
+public class HealthController implements HealthApi{
+
+}

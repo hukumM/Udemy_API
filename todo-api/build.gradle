@@ -20,38 +20,10 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0'
-    implementation 'io.swagger.core.v3:swagger-annotations:2.2.8'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'   
+	implementation 'io.swagger.core.v3:swagger-annotations:2.2.8'	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
  }
-
-
-//openApiGenerate {
-//    // 出力形式
-//    generatorName = 'spring'
-//
-//    // OpenAPI仕様ファイル（yaml）のパス
-//    inputSpec = "$rootDir/openapi/shukanTalentJohoBFF.yaml"
-//
-//    // 生成コードの出力先
-//    outputDir = "$buildDir/generated"
-//
-//    // パッケージ構成
-//    apiPackage = 'com.example.api'
-//    modelPackage = 'com.example.model'
-//    invokerPackage = 'com.example.invoker'
-//
-//    // 追加オプション
-//    configOptions = [
-//		interfaceOnly: "true",
-//		useSpringBoot3: "true"   
-//    ]
-//}
-
 
 openApiValidate {
 	inputSpec = "$rootDir/src/main/resources/api-schema.yaml"
