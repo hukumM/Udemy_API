@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.4'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.openapi.generator' version '6.4.0'
+}
+
+group = 'com.example'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // ★FIX: Swagger UI を /swagger-ui/** として配信するために springdoc を追加
+    // これがないと http://localhost:8080/swagger-ui/index.html は 404(Whitelabel) になります
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+openApiValidate {
+    inputSpec = "$rootDir/src/main/resources/api-schema.yaml"
+}
+
+// ★FIX: sourceSets の追加先が2つあり分かりづらかったので整理
+// openapi-generator の spring 出力先(build/spring/...) をビルド対象に含める
+sourceSets {
+    main {
+        java {
+            srcDir("$buildDir/spring/src/main/java")
+            // ★FIX: 使っていない/生成していないなら不要なので削除（必要なら復活OK）
+            // srcDir("$buildDir/generated/src/main/java")
+        }
+    }
+}
+
+tasks.register('buildApiDoc', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName.set("html2")
+    inputSpec.set("$rootDir/src/main/resources/static/api-schema.yaml")
+    outputDir.set("$buildDir/apidoc")
+}
+
+tasks.register('buildSpringServer', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/src/main/resources/static/api-schema.yaml")
+    outputDir.set("$buildDir/spring")
+
+    // ★FIX: パッケージ名にハイフン(-)は使えないので修正（コンパイルエラーの原因）
+    apiPackage.set("com.example.todoapi.controller")
+    modelPackage.set("com.example.todoapi.model")
+
+    configOptions.set([
+        interfaceOnly  : "true",
+        useJakartaEe   : "true"
+    ])
+}
+
+// ★FIX: compileJava は生成後にコンパイルされるよう依存関係を明示
+tasks.named('compileJava') {
+    dependsOn(tasks.named('buildSpringServer'))
+}
