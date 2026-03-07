@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.4'
+    id 'org.springframework.boot' version '3.1.12'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.openapi.generator' version '6.4.0'
 }
@@ -14,33 +14,43 @@ java {
     }
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    // ★A: H2 Console専用starterは使わず、H2本体だけ入れる
+    runtimeOnly 'com.h2database:h2'
+
+    // ★A: Boot 3.1系に合わせてMyBatisを3.0.2へ
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // ★FIX: Swagger UI を /swagger-ui/** として配信するために springdoc を追加
-    // これがないと http://localhost:8080/swagger-ui/index.html は 404(Whitelabel) になります
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    // springdoc（Boot 3.1でOKなライン）
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 }
 
 openApiValidate {
     inputSpec = "$rootDir/src/main/resources/api-schema.yaml"
 }
 
-// ★FIX: sourceSets の追加先が2つあり分かりづらかったので整理
-// openapi-generator の spring 出力先(build/spring/...) をビルド対象に含める
 sourceSets {
     main {
         java {
             srcDir("$buildDir/spring/src/main/java")
-            // ★FIX: 使っていない/生成していないなら不要なので削除（必要なら復活OK）
-            // srcDir("$buildDir/generated/src/main/java")
         }
     }
 }
@@ -56,17 +66,15 @@ tasks.register('buildSpringServer', org.openapitools.generator.gradle.plugin.tas
     inputSpec.set("$rootDir/src/main/resources/static/api-schema.yaml")
     outputDir.set("$buildDir/spring")
 
-    // ★FIX: パッケージ名にハイフン(-)は使えないので修正（コンパイルエラーの原因）
     apiPackage.set("com.example.todoapi.controller")
     modelPackage.set("com.example.todoapi.model")
 
     configOptions.set([
-        interfaceOnly  : "true",
-        useJakartaEe   : "true"
+        interfaceOnly: "true",
+        useJakartaEe : "true"
     ])
 }
 
-// ★FIX: compileJava は生成後にコンパイルされるよう依存関係を明示
 tasks.named('compileJava') {
     dependsOn(tasks.named('buildSpringServer'))
 }
