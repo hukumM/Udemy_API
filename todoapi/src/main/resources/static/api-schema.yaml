@@ -10,14 +10,51 @@ tags:
       description: タスク関連のAPI
 paths:
     /health:
-        get:
+        get:          
             tags:
                 - opts
             responses:
                 '200':
                     description: OK
+    /tasks/:
+        post:
+            summary: "タスク作成"
+            description: "タスクを新規作成"
+            operationId: "createTask"
+            tags:
+                - tasks
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/TaskForm"
+            responses:
+                '201':
+                    description: "Created"
+                    headers:
+                        location:
+                            description: "作成されたリソースのURI"
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/TaskDTO"                                
+                '400':
+                    description: "Bad Request"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BadRequestError"                                
+
+                        
+                            
+                   
     /tasks/{taskId}:
         get:
+            summary: "タスク取得"
+            description: "指定されたIDのタスクを1件取得"              
             tags:
                 - tasks
             operationId: showTask 
@@ -46,6 +83,17 @@ paths:
             
 components:
     schemas:
+        TaskForm:
+            type: object
+            properties:
+                title:
+                    type: string
+                    description: "作成されるタスクのタイトル"
+                    maxLength: 256
+                    minLength: 1
+            required:
+                - title
+            
         TaskDTO:
             type: object
             properties:
@@ -72,6 +120,40 @@ components:
                     description: "エラーの詳細"
             required:
                 - title
-                - detail            
+                - detail      
+        BadRequestError:
+            description: "リクエストが不正です"
+            type: object
+            properties:
+                title:
+                    type: string
+                    description: "エラータイトル"
+                    default: "Bad Request"
+                detail:
+                    type: string
+                    description: "エラー詳細"
+                    default: "リクエストが不正です。正しいリクエストでリトライ"
+                invalid-params:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/InvalidParam"
+            required:
+                - title
+                - detail
+                - invalid-params    
+        InvalidParam:
+            description: "不正なリクエストについての詳細"
+            properties:
+                name:
+                    type: string
+                    description: "エラーが発生したフィールド名"
+                reason:
+                    type: string
+                    description: "エラー理由"
+            required:
+                - name
+                - reason
+                                
+                         
                     
             
