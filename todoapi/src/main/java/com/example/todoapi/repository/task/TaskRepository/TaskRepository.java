@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface TaskRepository {
@@ -20,6 +21,9 @@ public interface TaskRepository {
 
 	@Select("select * from tasks limit #{limit} offset #{offset}")
 	List<TaskRecord> selectList(int limit, long offset);
+
+	@Update("update tasks set title = #{title} where id = #{id}")
+	void update(TaskRecord taskRecord);
 	
 	
 

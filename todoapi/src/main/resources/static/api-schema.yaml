@@ -56,7 +56,8 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/BadRequestError"   
-                                    
+                
+                
         post:
             summary: "タスク作成"
             description: "タスクを新規作成"
@@ -92,6 +93,48 @@ paths:
                             
                    
     /tasks/{taskId}:
+        put:
+            summary: "タスク更新"
+            description: "指定されたタスクをリクエストボディの内容で上書き"              
+            tags:
+                - tasks
+            operationId: editTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int64
+                    minimum: 1
+            responses:
+                '200':
+                    description: "OK"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/TaskDTO"
+                '400':
+                    description: "Bad Request"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BadRequestError"                                
+                '404':
+                    description: 'Not Found'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ResourceNotFound"   
+                                
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/TaskForm"                       
+                         
+            
         get:
             summary: "タスク取得"
             description: "指定されたIDのタスクを1件取得"              

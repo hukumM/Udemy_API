@@ -35,4 +35,11 @@ public class TaskService {
 		return new TaskEntity(record.getId(), record.getTitle());
 	}
 
+	public TaskEntity upedate(Long taskId, String title) {
+		taskRepository.update(new TaskRecord(taskId, title));
+		taskRepository.select(taskId)
+						.orElseThrow(() -> new TaskEntityNotFoundException(taskId));
+		return find(taskId);
+	}
+
 }
