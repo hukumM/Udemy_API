@@ -3,6 +3,7 @@ package com.example.todoapi.repository.task.TaskRepository;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -24,6 +25,9 @@ public interface TaskRepository {
 
 	@Update("update tasks set title = #{title} where id = #{id}")
 	void update(TaskRecord taskRecord);
+
+	@Delete("delete from tasks where id = #{id}")
+	void delete(Long taskId);
 	
 	
 

@@ -88,10 +88,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/BadRequestError"                                
-
-                        
-                            
-                   
+           
     /tasks/{taskId}:
         put:
             summary: "タスク更新"
@@ -162,7 +159,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/ResourceNotFound"
-
+        delete:
+            summary: "タスク削除"
+            description: "指定されたタスクを削除"              
+            tags:
+                - tasks
+            operationId: deleteTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int64
+                    minimum: 1
+            responses:
+                '204':
+                    description: "No Content"   
+                '404':
+                    description: "Not Found"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ResourceNotFound"                                         
             
 components:
     schemas:
