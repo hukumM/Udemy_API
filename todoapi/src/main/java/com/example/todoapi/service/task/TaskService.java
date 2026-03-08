@@ -1,5 +1,8 @@
 package com.example.todoapi.service.task;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.example.todoapi.repository.task.TaskRepository.TaskRecord;
@@ -19,6 +22,13 @@ public class TaskService {
 				.orElseThrow(() -> new TaskEntityNotFoundException(taskId));
 	}
 
+	public List<TaskEntity> find(int limit, long offset) {
+		return taskRepository.selectList(limit, offset)
+				.stream()
+				.map(record -> new TaskEntity(record.getId(), record.getTitle()))
+				.collect(Collectors.toList());
+	}
+	
 	public TaskEntity create(String title) {
 		var record = new TaskRecord(null, title);
 		taskRepository.insert(record);

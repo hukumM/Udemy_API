@@ -1,5 +1,6 @@
 package com.example.todoapi.repository.task.TaskRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.ibatis.annotations.Insert;
@@ -16,6 +17,9 @@ public interface TaskRepository {
 	@Options(useGeneratedKeys = true, keyProperty = "id")
 	@Insert("insert into tasks (title) values (#{title})")
 	void insert(TaskRecord record);
+
+	@Select("select * from tasks limit #{limit} offset #{offset}")
+	List<TaskRecord> selectList(int limit, long offset);
 	
 	
 
